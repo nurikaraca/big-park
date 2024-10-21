@@ -1,0 +1,1 @@
+![Image](C:\Users\nurik\OneDrive\Masaüstü\produtctİmages\Yeni klasör (2))
