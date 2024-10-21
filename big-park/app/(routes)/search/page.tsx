@@ -1,0 +1,252 @@
+'use client'
+
+import { Input } from "@/components/ui/input"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination"
+
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Category, Color, Product, Size } from "@/constans/type"
+import axios from "axios"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import HomeProductSkeleton from "../_components/Skeleton/HomeProductSkeleton"
+import ProductItem from "../_components/Product/ProductItem"
+const SearchPage = () => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [products, setProducts] = useState<Product[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState(searchParams.get('q') || '');
+    const [color, setColor] = useState<Color | string>(searchParams.get('color') || 'all');
+    const [size, setSize] = useState<Size | string>(searchParams.get('size') || 'all');
+    const [category, setCategory] = useState<Category | string>(searchParams.get('category') || 'all');
+
+    const [colors, setColors] = useState<Color[]>([]);
+    const [sizes, setSizes] = useState<Size[]>([])
+    const [categories, setCategories] = useState<Category[]>([])
+
+    const [page, setPage] = useState<number>(parseInt(searchParams.get('page') ?? "1"));
+    const [pageSize] = useState(8);
+    const [totalPages, setTotalPages] = useState(1);
+    const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        fetchColorsSizesCategorys();
+        fetchProducts({
+            search: searchParams.get('q') || '',
+            category: searchParams.get('category') || 'all',
+            color: searchParams.get('color') || 'all',
+            size: searchParams.get('size') || 'all',
+            page:parseInt(searchParams.get('page') || "1") 
+        });
+
+    }, [searchParams])
+
+    const fetchColorsSizesCategorys = async () => {
+        try {
+            const colorsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/colors`);
+            setColors(colorsResponse.data.data)
+            const sizesResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/sizes`);
+            setSizes(sizesResponse.data.data)
+            const categoriesResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/categories`);
+            setCategories(categoriesResponse.data.data)
+
+
+        } catch (error) {
+            console.error('Error fetching color size category:', error);
+        }
+    }
+    const fetchProducts = async (filters: { search?: string, category?: string, color?: string, size?: string,  page?: number} = {}) => {
+        setLoading(true)
+        try {
+            const params = new URLSearchParams();
+            if (filters.search) {
+                params.append('filters[name][$contains]', filters.search)
+            }
+
+            if (filters.category && filters.category !== 'all') {
+                params.append('filters[category][slug][$eq]', filters.category)
+            }
+            if(filters.color && filters.color !== 'all'){
+                params.append('filters[colors][name][$eq]', filters.color)
+            }
+            if(filters.size && filters.size !== 'all'){
+                params.append('filters[sizes][name][$eq]', filters.size)
+            }
+
+            params.append('pagination[page]', (filters.page ?? 1).toString());
+            params.append('pagination[pageSize]', pageSize.toString());
+
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/products?populate=*&${params.toString()}`);
+            setProducts(response.data.data);
+            setTotalPages(response.data.meta.pagination.pageCount);
+            console.log(response);
+        } catch (error) {
+            console.log("eerrr", error)
+        }
+        finally{
+            setLoading(false);
+        }
+    }
+    const updateURL = (key: any, value: any) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (value && value !== 'all') {
+            newParams.set(key, value)
+        }
+        else {
+            newParams.delete(key);
+        }
+        if (key !== 'page') {
+            //! { normalde 1  tırnak içine almıyo}
+            newParams.set('page', "1")
+        }
+        router.push(`/search?${newParams.toString()}`)
+    }
+    useEffect(() => {
+        const delyDebounceFn = setTimeout(() => {
+            updateURL('q', search)
+        }, 2000)
+        return () => clearTimeout(delyDebounceFn); 
+    }, [search])
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearch(value);
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout)
+        }
+        const timeout = setTimeout(() => {
+            updateURL("q", value);
+        }, 2000);
+
+        setDebounceTimeout(timeout)
+
+    }
+
+    const handleColorChange = (value:string) => {
+        setColor(value);
+        updateURL('color', value)
+    }
+    const handleSizeChange = (value: string) => {
+        setSize(value);
+        updateURL('size', value)
+    }
+    const handleCategoryChange = (value: string) => {
+        setCategory(value);
+        updateURL('category', value)
+    }
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage < 1 || newPage > totalPages) return;
+        setPage(newPage);
+        updateURL('page', newPage)
+    }
+
+
+
+    return (
+        <div className='container mt-8'>
+            <div className='grid grid-cols-1 lg:grid-cols-4 gap-4 bgone borderone p-2 rounded-md'>
+                <Input className='w-full' placeholder='Search....' onChange={handleSearchChange} />
+                <Select onValueChange={handleColorChange}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All Color" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Color</SelectItem>
+                        {colors.map((color) => (
+
+                            <SelectItem key={color.id} value={color.name}>{color.name}</SelectItem>
+
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select onValueChange={handleSizeChange}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All Sizes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Sizes</SelectItem>
+                        {sizes.map((size) => (
+
+                            <SelectItem key={size.id} value={size.name}>{size.name}</SelectItem>
+
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                <Select onValueChange={handleCategoryChange}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="All Categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {categories.map((category) => (
+
+                            <SelectItem key={category.id} value={category.slug}>{category.name}</SelectItem>
+
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div>
+                {loading ? (
+                    <HomeProductSkeleton />
+                ) : (
+                    <div>
+                        <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-8 mb-8'>
+                            {products.map((product, index) => (
+                                <ProductItem
+                                    key={index}
+                                    product={product}
+                                />
+                            ))}
+                        </div>
+                        <div className='flex justify-center items-center mt-8 mb-8'>
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious href="#" onClick={() => handlePageChange(page - 1)} aria-disabled={page === 1} />
+                                    </PaginationItem>
+                                    {[...Array(totalPages)].map((_, i) => (
+                                        <PaginationItem key={i}>
+                                            <PaginationLink
+                                                href="#"
+                                                onClick={() => handlePageChange(i + 1)}
+                                                className={i + 1 === page ? 'border border-blue-500' : ''}
+                                            >
+                                                {i + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+                                    <PaginationItem>
+                                        <PaginationNext href="#" onClick={() => handlePageChange(page + 1)} aria-disabled={page === totalPages} />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}
+
+export default SearchPage
