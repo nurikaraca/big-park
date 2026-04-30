@@ -1,4 +1,5 @@
 import { OrderItem } from '@/constans/type';
+import { getMediaUrl } from '@/lib/media';
 import Image from 'next/image';
 import React from 'react'
 
@@ -12,7 +13,7 @@ const MyorderItem = ({ orderItem }: MyOrderItemProps) => {
             <div className='grid grid-cols-6 mt-3 items-center border borderone p-2 bgone gap-8'>
                 <Image
                     unoptimized={true}
-                    src={process.env.NEXT_PUBLIC_BACKEND_URL + orderItem.product.images[0].url}
+                    src={getMediaUrl(orderItem.product.images[0].url)}
                     width={80}
                     height={80}
                     alt={orderItem.product.name}

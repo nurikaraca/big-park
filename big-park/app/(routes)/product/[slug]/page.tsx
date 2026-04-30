@@ -1,5 +1,6 @@
 import { getProducts } from "@/actions/getProducts";
 import { Product } from "@/constans/type";
+import { getMediaUrl } from "@/lib/media";
 import { getAbsoluteUrl, siteConfig } from "@/lib/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -45,7 +46,7 @@ export const generateMetadata = async ({
   const description =
     product.description || `${product.name} is available at ${siteConfig.name}.`;
   const imageUrl = product.images?.[0]?.url
-    ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${product.images[0].url}`
+    ? getMediaUrl(product.images[0].url)
     : undefined;
   const canonical = getAbsoluteUrl(`/product/${product.slug}`);
 
@@ -93,9 +94,7 @@ const ProductDetailPage = async ({ params }: ProductDetailPageProps) => {
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images?.map(
-      (image) => `${process.env.NEXT_PUBLIC_BACKEND_URL}${image.url}`
-    ),
+    image: product.images?.map((image) => getMediaUrl(image.url)),
     sku: product.documentId,
     category: product.category?.name,
     offers: {

@@ -15,6 +15,7 @@ import SliderSkeleton from './Skeleton/SliderSkeleton';
 import Autoplay from "embla-carousel-autoplay"
 import Link from 'next/link';
 import Image from 'next/image';
+import { getMediaUrl } from '@/lib/media';
 
 
 const SliderComponent = () => {
@@ -58,10 +59,7 @@ const SliderComponent = () => {
                    <Image
                     alt='slider'
                     unoptimized={true}
-                    src={
-                        process.env.NEXT_PUBLIC_BACKEND_URL+
-                        slider?.media?.url
-                    }
+                    src={getMediaUrl(slider?.media?.url)}
                     width={500}
                     height={300}
                     className='w-full h-[200px] md:h-[650px] object-fill'

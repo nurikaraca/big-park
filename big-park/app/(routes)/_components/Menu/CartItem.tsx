@@ -2,6 +2,7 @@ import { CartItem as CartItemType } from '@/constans/type';
 import { TrashIcon } from 'lucide-react';
 import Image from 'next/image';
 import React from 'react'
+import { getMediaUrl } from '@/lib/media';
 
 
 interface CartItemProps {
@@ -14,10 +15,7 @@ const CartItem = ({ item, onDeleteItem }: CartItemProps) => {
       <div className="flex gap-4 items-center">
         <Image
           unoptimized={true}
-          src={
-            process.env.NEXT_PUBLIC_BACKEND_URL +
-            item.imageUrl
-          }
+          src={getMediaUrl(item.imageUrl)}
           width={90} height={90}
           alt={item.name}
           className='border borderone p-2'

@@ -9,8 +9,9 @@ import {
     CarouselNext,
     CarouselPrevious,
   } from "@/components/ui/carousel"
-  import Autoplay from "embla-carousel-autoplay"
+import Autoplay from "embla-carousel-autoplay"
 import Image from 'next/image'
+import { getMediaUrl } from '@/lib/media'
 
 
 
@@ -42,10 +43,7 @@ const ProductImages = ({images}:ProductImagesProps) => {
         alt='alt'
         height={200}
         unoptimized={true}
-        src={
-          process.env.NEXT_PUBLIC_BACKEND_URL +
-          image.url
-        }
+        src={getMediaUrl(image.url)}
          className='rounded-3xl scale-95 w-[300px] h-[300px] group-hover:scale-100 transition-all duration-700'
         />
       </CarouselItem>

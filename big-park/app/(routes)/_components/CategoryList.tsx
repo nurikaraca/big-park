@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import CategorySkeleton from "./Skeleton/CategorySkeleton";
 import Image from "next/image";
 import Link from "next/link";
+import { getMediaUrl } from "@/lib/media";
 
 const CategoryList = () => {
 
@@ -45,10 +46,7 @@ const CategoryList = () => {
                         <Image
                         alt=''
                         unoptimized={true}
-                        src={
-                            process.env.NEXT_PUBLIC_BACKEND_URL +
-                            category?.image.url
-                          }
+                        src={getMediaUrl(category?.image.url)}
                         width={500}
                         height={300}
                         className='w-16 h-16'
