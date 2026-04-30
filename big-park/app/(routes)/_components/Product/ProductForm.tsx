@@ -36,7 +36,7 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
 
     useEffect(() => {
         reset();
-    }, [product])
+    }, [product, reset])
 
     const handleColorChange = (color: string) => {
         setColor(color);
@@ -122,11 +122,10 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
                    <SelectContent className='bgone textone overflow-y-auto max-h-60 '>
                        {product?.colors?.map((color) => (
                            <SelectItem
-                               key={product.id}
+                               key={color?.name}
                                value={color?.name}>
                                {color?.name}
                            </SelectItem>
-
                        ))}
 
                    </SelectContent>
@@ -141,8 +140,7 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
                  </SelectTrigger>
                  <SelectContent className='bgone textone overflow-y-auto max-h-60'>
                      {product?.sizes?.map((size) => (
-                         <SelectItem value={size?.name}>{size?.name} </SelectItem>
-
+                         <SelectItem key={size?.name} value={size?.name}>{size?.name} </SelectItem>
                      ))}
 
                  </SelectContent>

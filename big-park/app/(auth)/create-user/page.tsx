@@ -69,13 +69,12 @@ const router = useRouter();
             setLoader(false);
             router.push("/")
           },
-          (error)=>{
+          ()=>{
             setLoader(false);
             toast({
               variant:"destructive",
               title: "Something went wrong",
             })
-    
           }
         ).finally(()=>{
           setLoader(false)

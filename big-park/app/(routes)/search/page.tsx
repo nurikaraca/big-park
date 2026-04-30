@@ -55,7 +55,7 @@ const SearchPage = () => {
             page:parseInt(searchParams.get('page') || "1") 
         });
 
-    }, [searchParams])
+    }, [searchParams, fetchColorsSizesCategorys, fetchProducts])
 
     const fetchColorsSizesCategorys = async () => {
         try {
@@ -122,7 +122,7 @@ const SearchPage = () => {
             updateURL('q', search)
         }, 2000)
         return () => clearTimeout(delyDebounceFn); 
-    }, [search])
+    }, [search, updateURL])
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -170,9 +170,7 @@ const SearchPage = () => {
                     <SelectContent>
                         <SelectItem value="all">All Color</SelectItem>
                         {colors.map((color) => (
-
                             <SelectItem key={color.id} value={color.name}>{color.name}</SelectItem>
-
                         ))}
                     </SelectContent>
                 </Select>
@@ -184,9 +182,7 @@ const SearchPage = () => {
                     <SelectContent>
                         <SelectItem value="all">All Sizes</SelectItem>
                         {sizes.map((size) => (
-
                             <SelectItem key={size.id} value={size.name}>{size.name}</SelectItem>
-
                         ))}
                     </SelectContent>
                 </Select>
@@ -198,9 +194,7 @@ const SearchPage = () => {
                     <SelectContent>
                         <SelectItem value="all">All Categories</SelectItem>
                         {categories.map((category) => (
-
                             <SelectItem key={category.id} value={category.slug}>{category.name}</SelectItem>
-
                         ))}
                     </SelectContent>
                 </Select>
@@ -211,9 +205,9 @@ const SearchPage = () => {
                 ) : (
                     <div>
                         <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 mt-8 mb-8'>
-                            {products.map((product, index) => (
+                            {products.map((product) => (
                                 <ProductItem
-                                    key={index}
+                                    key={product.id}
                                     product={product}
                                 />
                             ))}

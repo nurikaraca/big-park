@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -56,7 +55,7 @@ interface CheckoutFormProps {
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) => {
   const { items, fetchItems } = useCartStore();
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<unknown>(null);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -117,7 +116,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
       zipCode: '34742',
     };
 
-    const basketItems = items.map((item:any) => ({
+    const basketItems = items.map((item: Record<string, unknown>) => ({
       id: item.documentId,
       name: item.name,
       category1: 'Collectibles',
@@ -151,7 +150,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
       console.log(response.data)
  
       if (response.data.status === "success") {
-        const OrderItems = items.map((item:any) => ({
+        const OrderItems = items.map((item: Record<string, unknown>) => ({
 
           
           product:item.productId,
@@ -180,9 +179,9 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
         await createOrder(payload, jwt);
 
 
-        items.forEach((item: any, index: any) => {
-          DeleteToCart(item.documentId, jwt).then(resp => {
-
+        items.forEach((item: Record<string, any>) => {
+          DeleteToCart(item.documentId, jwt).then(() => {
+            // ...
           })
         })
 

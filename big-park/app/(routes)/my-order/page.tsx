@@ -65,7 +65,7 @@ const MyOrderPage = () => {
       router.push('/')
     };
     getMyorder();
-  }, [])
+  }, [jwt, router])
 
 
   return (
@@ -77,7 +77,7 @@ const MyOrderPage = () => {
 
         <div className='mt-10'>
           {orderList.map((item, index) => (
-            <Collapsible key={index}>
+            <Collapsible key={item.id || index}>
               <CollapsibleTrigger className='grid grid-cols-7 mt-3 items-center border borderone p-2 bgone gap-8'>
                 <h2> <span className='font-bol mr-2'>Order Date :</span> {moment(item?.createdAt).format('DD/MMM/yyy')} </h2>
                 <h2> <span className='font-bol mr-2'>Total :</span> {item?.subtotal} </h2>
@@ -88,7 +88,7 @@ const MyOrderPage = () => {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 {item.orderItemList && item.orderItemList.map((order, index_) => (
-                  <MyorderItem key={index_} orderItem={order} />
+                  <MyorderItem key={order.id || index_} orderItem={order} />
                 ))}
               </CollapsibleContent>
             </Collapsible>

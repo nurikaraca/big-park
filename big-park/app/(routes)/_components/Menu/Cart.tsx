@@ -35,7 +35,7 @@ const Cart = ({jwt,userId}:CartProps) => {
 
   useEffect(()=>{
     fetchItems(userId,jwt)
-  }, [fetchItems])
+  }, [fetchItems, userId, jwt])
 
   useEffect(()=>{
     let total =0;

@@ -17,15 +17,15 @@ import {
 const UserMenu = () => {
   const {jwt,setJwt} = useAuthStore();
   useEffect(() =>{
-    if(typeof window !="undefined"){
+    if(typeof window !=="undefined"){
       const jwt = localStorage.getItem("jwt");
       const user= localStorage.getItem("user");
       if(jwt && user) {
-        const userObj = JSON.parse(user);
+        // const userObj = JSON.parse(user); // kullanılmıyor
         setJwt(jwt)
       }
     }
-  },[])
+  },[setJwt])
 
   const onSignout = ()=>{
 
