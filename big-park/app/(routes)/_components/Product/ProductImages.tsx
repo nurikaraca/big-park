@@ -1,3 +1,5 @@
+"use client"
+
 import { Product } from '@/constans/type'
 import React from 'react'
 import {

@@ -1,7 +1,6 @@
 'use client'
 import { DeleteToCart } from '@/actions/cart/deleteToCart';
 import useCartStore from '@/hooks/useCartStore';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import CartItem from '../_components/Menu/CartItem';
 import CheckoutForm from '../_components/CheckoutForm';
@@ -11,7 +10,6 @@ const CheckoutPage = () => {
 
     const {items, fetchItems} = useCartStore();
     const [subtotal, setSubTotal] = useState(0);
-    const router = useRouter();
 
     let jwt = ''; 
     let user = '';
@@ -38,7 +36,7 @@ const CheckoutPage = () => {
       useEffect(()=>{
         let total =0;
         console.log(items)
-        items.forEach((element: any) =>{
+        items.forEach((element) =>{
           total = total+element.amount
         });
         setSubTotal(parseFloat(total.toFixed(2)));
@@ -58,7 +56,7 @@ const CheckoutPage = () => {
             </div>
 
             <div className='col-span-1 bgone border borderone justify-center items-center rounded-md lg:h-screen'>
-              {items.map((item: any)=>(
+              {items.map((item)=>(
                 <CartItem key={item.id}  item={item} onDeleteItem={onDeleteItem}/>
               ))}
               <div className='flex border border-one justify-center items-center'>

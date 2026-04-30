@@ -9,7 +9,7 @@ const Search = () => {
   const router = useRouter();
   const [query, setQuery]= useState('')
   
-  const handleInputChange = (event: any)=>{
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
     setQuery(event.target.value)
   }
   const handleSearch = () =>{

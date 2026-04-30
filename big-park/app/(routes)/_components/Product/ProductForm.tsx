@@ -1,4 +1,6 @@
 
+"use client"
+
 import { Product } from '@/constans/type'
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
@@ -8,9 +10,7 @@ import { Loader2Icon, Minus, PlusIcon } from 'lucide-react';
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
@@ -26,7 +26,7 @@ interface ProductFormProps {
 const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
     const [loading, setLoading] = useState(false);
 
-     const fetchItems = useCartStore((state: any)=>state.fetchItems);
+    const fetchItems = useCartStore((state) => state.fetchItems);
     const router = useRouter();
 
     const { toast } = useToast()
@@ -66,11 +66,12 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
 
     const onAddCart = async () => {
 
-        if (!userId && !jwt) {
+        if (!userId || !jwt) {
             router.push("/login")
+            return;
         }
 
-        if ((product.colors?.length && !selectedColor) || (product.sizes?.length && !selectedColor)) {
+        if ((product.colors?.length && !selectedColor) || (product.sizes?.length && !selectedSize)) {
             toast({
                 title: "Color and Size required ",
                 variant: "destructive"
@@ -93,7 +94,7 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
                 }
             }
             await AddToCart(data, jwt)
-             fetchItems(userId,jwt)
+            fetchItems(userId, jwt)
             toast({
                 title: "Add to Cart ",
                 variant: "success"
@@ -113,40 +114,38 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
         <>
             <div className='flex flex-row'>
 
-             {product.colors?.length > 0 &&(
-                   <Select onValueChange={handleColorChange}>
-                   <SelectTrigger className="w-[180px]">
-                       <SelectValue placeholder="Color" />
-                   </SelectTrigger>
-                  
-                   <SelectContent className='bgone textone overflow-y-auto max-h-60 '>
-                       {product?.colors?.map((color) => (
-                           <SelectItem
-                               key={color?.name}
-                               value={color?.name}>
-                               {color?.name}
-                           </SelectItem>
-                       ))}
+                {product.colors?.length > 0 && (
+                    <Select onValueChange={handleColorChange}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Color" />
+                        </SelectTrigger>
 
-                   </SelectContent>
-               </Select>
-             )}
+                        <SelectContent className='bgone textone overflow-y-auto max-h-60 '>
+                            {product?.colors?.map((color) => (
+                                <SelectItem
+                                    key={color?.name}
+                                    value={color?.name}>
+                                    {color?.name}
+                                </SelectItem>
+                            ))}
 
+                        </SelectContent>
+                    </Select>
+                )}
 
-               {product.sizes?.length > 0 &&  (
-                 <Select onValueChange={handlesizeChange}>
-                 <SelectTrigger className="w-[180px]">
-                     <SelectValue placeholder="Size" />
-                 </SelectTrigger>
-                 <SelectContent className='bgone textone overflow-y-auto max-h-60'>
-                     {product?.sizes?.map((size) => (
-                         <SelectItem key={size?.name} value={size?.name}>{size?.name} </SelectItem>
-                     ))}
+                {product.sizes?.length > 0 && (
+                    <Select onValueChange={handlesizeChange}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Size" />
+                        </SelectTrigger>
+                        <SelectContent className='bgone textone overflow-y-auto max-h-60'>
+                            {product?.sizes?.map((size) => (
+                                <SelectItem key={size?.name} value={size?.name}>{size?.name} </SelectItem>
+                            ))}
 
-                 </SelectContent>
-             </Select>
-
-               )}
+                        </SelectContent>
+                    </Select>
+                )}
 
 
 
@@ -160,7 +159,7 @@ const ProductForm = ({ product, btnVisible }: ProductFormProps) => {
                 <Button size="xs" onClick={incrementQuantity}>
                     <PlusIcon />
                 </Button>
-                ${TotalPrice}
+                {TotalPrice} TRY
 
             </div>
 

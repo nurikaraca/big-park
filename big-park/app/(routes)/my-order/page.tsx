@@ -2,34 +2,22 @@
 
 
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import moment from 'moment';
-import { ArrowDown10, ArrowDownIcon, ArrowUp } from 'lucide-react';
+import { ArrowDownIcon } from 'lucide-react';
 import MyorderItem from '../_components/MyOrderItem';
 import useCartStore from '@/hooks/useCartStore';
 import { getToOrder } from '@/actions/cart/getToOrder';
-
-type OrderItem = {
-  id: number;
-  subtotal: number;
-  paymentText: string;
-  orderItemList: Array<{
-    product: {
-      images: Array<{ url: string }>
-    }
-  }>;
-  createdAt: string;
-};
+import { Order } from '@/constans/type';
 
 const MyOrderPage = () => {
-  const { items, fetchItems } = useCartStore()
-  const [fetchTrigger, setFetchTrigger] = useState(false);
-  const [orderList, setOrderList] = useState<OrderItem[]>([]);
+  const { fetchItems } = useCartStore()
+  const [orderList, setOrderList] = useState<Order[]>([]);
   const router = useRouter();
 
   let jwt = "";
@@ -51,13 +39,13 @@ const MyOrderPage = () => {
 
   useEffect(() => {
     fetchItems(userId, jwt);
-  }, [userId, jwt, fetchItems, fetchTrigger]);
+  }, [userId, jwt, fetchItems]);
 
-  const getMyorder = async () => {
+  const getMyorder = useCallback(async () => {
     const orderList_ = await getToOrder(userId, jwt)
     console.log(orderList_)
     setOrderList(orderList_)
-  }
+  }, [userId, jwt])
 
 
   useEffect(() => {
@@ -65,7 +53,7 @@ const MyOrderPage = () => {
       router.push('/')
     };
     getMyorder();
-  }, [jwt, router])
+  }, [jwt, router, getMyorder])
 
 
   return (

@@ -1,14 +1,11 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Sheet,
   SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -39,7 +36,7 @@ const Cart = ({jwt,userId}:CartProps) => {
 
   useEffect(()=>{
     let total =0;
-    items.forEach((element : any) =>{
+    items.forEach((element) =>{
       total = total+element.amount
     });
     setSubTotal(parseFloat(total.toFixed(2)));
@@ -79,7 +76,7 @@ const Cart = ({jwt,userId}:CartProps) => {
               <p>Your cart is Empty</p>
             ):(
               <ul>
-                {items.map((item: any)=>(
+                {items.map((item)=>(
                    <CartItem key={item.id}  item={item} onDeleteItem={onDeleteItem}/>
                   
                 ))}
@@ -91,7 +88,7 @@ const Cart = ({jwt,userId}:CartProps) => {
   
           <SheetClose asChild>
             <div className='absolute w-[90%] bottom-6 flex-col'>
-              <h2 className='text-lg flex justify-between'>SubTotal <span>${subTotal}</span> </h2>
+              <h2 className='text-lg flex justify-between'>SubTotal <span>{subTotal} TRY</span> </h2>
   
   
               <div>

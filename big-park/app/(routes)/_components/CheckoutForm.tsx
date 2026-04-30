@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React from 'react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, SubmitHandler } from "react-hook-form"
 import { z } from "zod"
@@ -48,14 +48,13 @@ interface FormData {
 }
 
 interface CheckoutFormProps {
-  subtotal: string;
+  subtotal: number;
   userId: string;
   jwt: string;
 }
 
 const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) => {
   const { items, fetchItems } = useCartStore();
-  const [response, setResponse] = useState<unknown>(null);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -64,7 +63,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
     defaultValues: {
       name: "nuri karaca",
       phone: "+90 234533434",
-      address: "İstanbul, Türkiye",
+      address: "Istanbul, Turkiye",
       holdername: "karaca",
       ccnumber: "5528790000000008",
       month: 12,
@@ -95,28 +94,28 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
       registrationDate: '2013-04-21 15:12:09',
       registrationAddress: data.address,
       ip: '85.34.78.112',
-      city: 'İstanbul',
-      country: 'Türkiye',
+      city: 'Istanbul',
+      country: 'Turkiye',
       zipCode: '34732',
     };
 
     const shippingAddress = {
       contactName: data.name,
-      city: 'İstanbul',
-      country: 'Türkiye',
+      city: 'Istanbul',
+      country: 'Turkiye',
       address: data.address,
       zipCode: '34742',
     };
 
     const billingAddress = {
       contactName: data.name,
-      city: 'İstanbul',
-      country: 'Türkiye',
+      city: 'Istanbul',
+      country: 'Turkiye',
       address: data.address,
       zipCode: '34742',
     };
 
-    const basketItems = items.map((item: Record<string, unknown>) => ({
+    const basketItems = items.map((item) => ({
       id: item.documentId,
       name: item.name,
       category1: 'Collectibles',
@@ -140,17 +139,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
     };
 
     try {
-      const response = await axios.post('http://localhost:3002/api/payment', paymentData, {
+      const paymentApiUrl =
+        process.env.NEXT_PUBLIC_PAYMENT_API_URL || "http://localhost:3002/api/payment";
+
+      const response = await axios.post(paymentApiUrl, paymentData, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
      
-      setResponse(response.data);
       console.log(response.data)
  
       if (response.data.status === "success") {
-        const OrderItems = items.map((item: Record<string, unknown>) => ({
+        const OrderItems = items.map((item) => ({
 
           
           product:item.productId,
@@ -179,11 +180,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ subtotal, jwt, userId }) =>
         await createOrder(payload, jwt);
 
 
-        items.forEach((item: Record<string, any>) => {
-          DeleteToCart(item.documentId, jwt).then(() => {
-            // ...
-          })
-        })
+        await Promise.all(items.map((item) => DeleteToCart(item.documentId, jwt)));
 
         toast({
           variant: "success",

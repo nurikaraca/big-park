@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input"
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
@@ -14,27 +13,26 @@ import {
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
 import { Category, Color, Product, Size } from "@/constans/type"
 import axios from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { Suspense, useCallback, useEffect, useState } from "react"
 import HomeProductSkeleton from "../_components/Skeleton/HomeProductSkeleton"
 import ProductItem from "../_components/Product/ProductItem"
-const SearchPage = () => {
+
+const SearchContent = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState(searchParams.get('q') || '');
-    const [color, setColor] = useState<Color | string>(searchParams.get('color') || 'all');
-    const [size, setSize] = useState<Size | string>(searchParams.get('size') || 'all');
-    const [category, setCategory] = useState<Category | string>(searchParams.get('category') || 'all');
+    const [, setColor] = useState<Color | string>(searchParams.get('color') || 'all');
+    const [, setSize] = useState<Size | string>(searchParams.get('size') || 'all');
+    const [, setCategory] = useState<Category | string>(searchParams.get('category') || 'all');
 
     const [colors, setColors] = useState<Color[]>([]);
     const [sizes, setSizes] = useState<Size[]>([])
@@ -43,21 +41,7 @@ const SearchPage = () => {
     const [page, setPage] = useState<number>(parseInt(searchParams.get('page') ?? "1"));
     const [pageSize] = useState(8);
     const [totalPages, setTotalPages] = useState(1);
-    const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
-
-    useEffect(() => {
-        fetchColorsSizesCategorys();
-        fetchProducts({
-            search: searchParams.get('q') || '',
-            category: searchParams.get('category') || 'all',
-            color: searchParams.get('color') || 'all',
-            size: searchParams.get('size') || 'all',
-            page:parseInt(searchParams.get('page') || "1") 
-        });
-
-    }, [searchParams, fetchColorsSizesCategorys, fetchProducts])
-
-    const fetchColorsSizesCategorys = async () => {
+    const fetchColorsSizesCategorys = useCallback(async () => {
         try {
             const colorsResponse = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/colors`);
             setColors(colorsResponse.data.data)
@@ -70,8 +54,8 @@ const SearchPage = () => {
         } catch (error) {
             console.error('Error fetching color size category:', error);
         }
-    }
-    const fetchProducts = async (filters: { search?: string, category?: string, color?: string, size?: string,  page?: number} = {}) => {
+    }, [])
+    const fetchProducts = useCallback(async (filters: { search?: string, category?: string, color?: string, size?: string,  page?: number} = {}) => {
         setLoading(true)
         try {
             const params = new URLSearchParams();
@@ -102,11 +86,12 @@ const SearchPage = () => {
         finally{
             setLoading(false);
         }
-    }
-    const updateURL = (key: any, value: any) => {
+    }, [pageSize])
+    const updateURL = useCallback((key: string, value: string | number) => {
         const newParams = new URLSearchParams(searchParams);
-        if (value && value !== 'all') {
-            newParams.set(key, value)
+        const stringValue = String(value);
+        if (stringValue && stringValue !== 'all') {
+            newParams.set(key, stringValue)
         }
         else {
             newParams.delete(key);
@@ -116,7 +101,19 @@ const SearchPage = () => {
             newParams.set('page', "1")
         }
         router.push(`/search?${newParams.toString()}`)
-    }
+    }, [router, searchParams])
+
+    useEffect(() => {
+        fetchColorsSizesCategorys();
+        fetchProducts({
+            search: searchParams.get('q') || '',
+            category: searchParams.get('category') || 'all',
+            color: searchParams.get('color') || 'all',
+            size: searchParams.get('size') || 'all',
+            page:parseInt(searchParams.get('page') || "1") 
+        });
+
+    }, [searchParams, fetchColorsSizesCategorys, fetchProducts])
     useEffect(() => {
         const delyDebounceFn = setTimeout(() => {
             updateURL('q', search)
@@ -127,15 +124,6 @@ const SearchPage = () => {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-        if (debounceTimeout) {
-            clearTimeout(debounceTimeout)
-        }
-        const timeout = setTimeout(() => {
-            updateURL("q", value);
-        }, 2000);
-
-        setDebounceTimeout(timeout)
-
     }
 
     const handleColorChange = (value:string) => {
@@ -240,6 +228,14 @@ const SearchPage = () => {
                 )}
             </div>
         </div>
+    )
+}
+
+const SearchPage = () => {
+    return (
+        <Suspense fallback={<HomeProductSkeleton />}>
+            <SearchContent />
+        </Suspense>
     )
 }
 

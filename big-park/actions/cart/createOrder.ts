@@ -2,7 +2,25 @@ import axios from "axios"
 
 const Urls = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/orders`
 
-export const createOrder = async (data: any, jwt: string) => {
+type CreateOrderPayload = {
+    data: {
+        name: string;
+        phone: string;
+        address: string;
+        subtotal: number;
+        paymentText: string;
+        userId: string;
+        OrderItemList: Array<{
+            product: number;
+            quantity: number;
+            amount: number;
+            color: string;
+            size: string;
+        }>;
+    };
+}
+
+export const createOrder = async (data: CreateOrderPayload, jwt: string) => {
     try {
         const response = await axios.post(Urls, data, {
             headers: {
@@ -29,7 +47,7 @@ export const createOrder = async (data: any, jwt: string) => {
 
 // const Urls = `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/orders`;
 
-// export const createOrder = async (data: any, jwt: string) => {
+// export const createOrder = async (data: unknown, jwt: string) => {
 //    console.log("işte data  => ", data)
 //     try {
 //          const response = await axios.post(Urls,data,

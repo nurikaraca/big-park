@@ -35,7 +35,7 @@ export type Product={
     name:string;
     description:string;
     slug:string;
-    mrp:Number;
+    mrp:number;
     sellingPrice:number; 
     isTop:boolean;
     recent:boolean;
@@ -43,4 +43,38 @@ export type Product={
     category:Category;
     colors:Color[];
     sizes:Size[];
+}
+
+export type CartItem = {
+    id?: number;
+    name: string;
+    quantity: number;
+    amount: number;
+    documentId: string;
+    color: string;
+    size: string;
+    productId: number;
+    imageUrl: string;
+}
+
+export type OrderProduct = {
+    name: string;
+    images: ProductImage[];
+}
+
+export type OrderItem = {
+    id?: number;
+    product: OrderProduct;
+    quantity: number;
+    amount: number;
+    color: string;
+    size: string;
+}
+
+export type Order = {
+    id: number;
+    subtotal: number;
+    paymentText: string;
+    orderItemList: OrderItem[];
+    createdAt: string;
 }
